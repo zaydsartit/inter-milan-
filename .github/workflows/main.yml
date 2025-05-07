@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-dotnet:
+    name: Build .NET API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'  # ولا اللي عندك انت
+
+      - name: Restore dependencies
+        run: dotnet restore ./MyApi
+
+      - name: Build
+        run: dotnet build ./MyApi --no-restore
+
+      - name: Test (optional)
+        run: dotnet test ./MyApi --no-build --verbosity normal
+
+  build-angular:
+    name: Build Angular App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # ولا اللي عندك انت
+
+      - name: Install dependencies
+        run: |
+          cd my-angular-app
+          npm install
+
+      - name: Build Angular app
+        run: |
+          cd my-angular-app
+          npm run build
