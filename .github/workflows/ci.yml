@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-dotnet:
-    name: Build .NET API
+    name: Build & Dockerize .NET API
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.408'  
+          dotnet-version: '8.0.408'
 
       - name: Restore dependencies
         run: dotnet restore ./MyApi
@@ -29,25 +29,36 @@ jobs:
       - name: Test (optional)
         run: dotnet test ./MyApi --no-build --verbosity normal
 
-  build-angular:
-    name: Build Angular App
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image (.NET API)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./MyApi  # dossier li fih Dockerfile dyal .NET
+          push: true
+          tags: docker.io/yourusername/dotnet-api:latest
+
+  dockerize-angularjs:
+    name: Dockerize AngularJS Frontend
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
         with:
-          node-version: '20.17.0'  
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: |
-          cd my-angular-app
-          npm install
-
-      - name: Build Angular app
-        run: |
-          cd my-angular-app
-          npm run build
+      - name: Build and push Docker image (AngularJS)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./my-angular-app
+          push: true
+          tags: docker.io/yourusername/angularjs-frontend:latest
