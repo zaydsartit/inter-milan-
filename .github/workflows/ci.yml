@@ -40,7 +40,7 @@ jobs:
         with:
           context: ./MyApi  # dossier li fih Dockerfile dyal .NET
           push: true
-          tags: docker.io/yourusername/dotnet-api:latest
+          tags: docker.io/zaavydexe/dotnet-api:latest
 
   dockerize-angularjs:
     name: Dockerize AngularJS Frontend
@@ -61,4 +61,4 @@ jobs:
         with:
           context: ./my-angular-app
           push: true
-          tags: docker.io/yourusername/angularjs-frontend:latest
+          tags: docker.io/zaavydexe/angularjs-frontend:latest
