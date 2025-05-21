@@ -23,5 +23,6 @@ if (app.Environment.IsDevelopment())
 
 // Map controllers
 app.MapControllers();
+app.Urls.Add("http://0.0.0.0:5170");
 
 app.Run();
