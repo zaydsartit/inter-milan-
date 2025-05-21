@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./MyApi
-          file: Dockerfile       # ✅ relatif au context: ./MyApi  
+          file: Dockerfile       
           push: true
           tags: |
             docker.io/zaavydexe/dotnet-api:latest
