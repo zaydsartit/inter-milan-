@@ -39,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./MyApi
+          file: ./MyApi/Dockerfile   
           push: true
           tags: |
             docker.io/zaavydexe/dotnet-api:latest
@@ -62,6 +63,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./my-angular-app
+          file: ./my-angular-app/Dockerfile 
           push: true
           tags: |
             docker.io/zaavydexe/angularjs-frontend:latest
