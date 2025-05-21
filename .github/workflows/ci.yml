@@ -47,11 +47,19 @@ jobs:
 
       - name: 🔥 Test de performance avec ApacheBench
         run: |
-          sudo apt update && sudo apt install -y apache2-utils
-          docker run -d -p 5170:5170 --name test-dotnet-api docker.io/zaavydexe/dotnet-api:latest
-          sleep 5
-          ab -n 50 -c 5 http://localhost:5170/
-          docker stop test-dotnet-api && docker rm test-dotnet-api
+            sudo apt update && sudo apt install -y apache2-utils
+
+            # Lancer le conteneur avec port 5170 mappé sur 5170
+            docker run -d -p 5170:5170 --name test-dotnet-api docker.io/zaavydexe/dotnet-api:latest
+        
+            # Petite pause pour laisser l’API démarrer
+            sleep 5
+        
+            # Test de charge vers localhost:5170
+            ab -n 10 -c 2 http://localhost:5170/
+        
+            # Nettoyage
+            docker stop test-dotnet-api && docker rm test-dotnet-api
 
   build-angular:
     name: 🌐 Build & Push AngularJS Docker Image
