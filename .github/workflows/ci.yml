@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI - Build and Push Docker Images (.NET API & AngularJS Frontend)
 
 on:
   push:
@@ -8,57 +8,67 @@ on:
 
 jobs:
   build-dotnet:
-    name: Build & Dockerize .NET API
+    name: 🧱 Build & Push .NET API Docker Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: ⚙️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.408'
 
-      - name: Restore dependencies
+      - name: 📦 Restore dependencies
         run: dotnet restore ./MyApi
 
-      - name: Build
+      - name: 🛠️ Build the project
         run: dotnet build ./MyApi --no-restore
 
-      - name: Test (optional)
+      - name: 🧪 Run tests (optional)
         run: dotnet test ./MyApi --no-build --verbosity normal
 
-      - name: Login to DockerHub
+      - name: 🔐 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (.NET API)
+      - name: 🐳 Build & Push .NET API Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./MyApi  # dossier li fih Dockerfile dyal .NET
+          context: ./MyApi
           push: true
-          tags: docker.io/zaavydexe/dotnet-api:latest
+          tags: |
+            docker.io/zaavydexe/dotnet-api:latest
+            docker.io/zaavydexe/dotnet-api:${{ github.run_number }}
 
-  dockerize-angularjs:
-    name: Dockerize AngularJS Frontend
+  build-angular:
+    name: 🌐 Build & Push AngularJS Docker Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to DockerHub
+      - name: 🔐 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (AngularJS)
+      - name: 🐳 Build & Push AngularJS Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./my-angular-app
           push: true
-          tags: docker.io/zaavydexe/angularjs-frontend:latest
+          tags: |
+            docker.io/zaavydexe/angularjs-frontend:latest
+            docker.io/zaavydexe/angularjs-frontend:${{ github.run_number }}
+
+      - name: 🏷️ Show image tags
+        run: |
+          echo "✅ AngularJS image published to:"
+          echo "➡️ docker.io/zaavydexe/angularjs-frontend:latest"
+          echo "➡️ docker.io/zaavydexe/angularjs-frontend:${{ github.run_number }}"
