@@ -38,8 +38,8 @@ jobs:
       - name: Build & Push .NET API Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./MyApi
-          file: Dockerfile       
+          context: .
+          file: ./MyApi/Dockerfile       
           push: true
           tags: |
             docker.io/zaavydexe/dotnet-api:latest
@@ -62,8 +62,8 @@ jobs:
       - name: Build & Push AngularJS Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./my-angular-app
-          file: Dockerfile  
+          context: .
+          file: ./my-angular-app/Dockerfile 
           push: true
           tags: |
             docker.io/zaavydexe/angularjs-frontend:latest
