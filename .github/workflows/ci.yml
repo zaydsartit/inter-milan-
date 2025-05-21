@@ -8,69 +8,93 @@ on:
 
 jobs:
   build-dotnet:
-    name: Build & Push .NET API Docker Image
+    name: 🧱 Build & Push .NET API Docker Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: ⚙️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.408'
 
-      - name: Restore dependencies
+      - name: 📦 Restore dependencies
         run: dotnet restore ./MyApi
 
-      - name: Build the project
+      - name: 🛠 Build the project
         run: dotnet build ./MyApi --no-restore
 
-      - name: Run tests (optional)
+      - name: 🧪 Run tests (optional)
         run: dotnet test ./MyApi --no-build --verbosity normal
 
-      - name: Login to Docker Hub
+      - name: 🔐 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push .NET API Docker image
+      - name: 🐳 Build & Push .NET API Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./MyApi
-          file: ./MyApi/Dockerfile       
+          file: ./MyApi/Dockerfile
           push: true
           tags: |
             docker.io/zaavydexe/dotnet-api:latest
             docker.io/zaavydexe/dotnet-api:${{ github.run_number }}
 
+      - name: 🔥 Test de performance avec ApacheBench
+        run: |
+            sudo apt update && sudo apt install -y apache2-utils
+
+            # Lancer le conteneur avec port 5170 mappé sur 5170
+            docker run -d -p 5170:5170 --name test-dotnet-api docker.io/zaavydexe/dotnet-api:latest
+        
+            # Petite pause pour laisser l’API démarrer
+            sleep 5
+        
+            # Test de charge vers localhost:5170
+            ab -n 10 -c 2 http://localhost:5170/
+        
+            # Nettoyage
+            docker stop test-dotnet-api && docker rm test-dotnet-api
+
   build-angular:
-    name: Build & Push AngularJS Docker Image
+    name: 🌐 Build & Push AngularJS Docker Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 🔄 Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
+      - name: 🔐 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push AngularJS Docker image
+      - name: 🐳 Build & Push AngularJS Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./my-angular-app
-          file: ./my-angular-app/Dockerfile 
+          file: ./my-angular-app/Dockerfile
           push: true
           tags: |
             docker.io/zaavydexe/angularjs-frontend:latest
             docker.io/zaavydexe/angularjs-frontend:${{ github.run_number }}
 
-      - name: Show image tags
+      - name: 🏷 Show image tags
         run: |
           echo "✅ AngularJS image published to:"
           echo "➡️ docker.io/zaavydexe/angularjs-frontend:latest"
           echo "➡️ docker.io/zaavydexe/angularjs-frontend:${{ github.run_number }}"
+
+      - name: 🔥 Test de performance AngularJS
+        run: |
+          sudo apt update && sudo apt install -y apache2-utils
+          docker run -d -p 8080:80 --name test-angular docker.io/zaavydexe/angularjs-frontend:latest
+          sleep 5
+          ab -n 30 -c 3 http://localhost:8080/
+          docker stop test-angular && docker rm test-angular
